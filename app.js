@@ -1,33 +1,29 @@
+// body - canvas tag
 const canvas = document.getElementById("jsCanvas");
-const ctx = canvas.getContext("2d"); // 요소를 연결하는데 document 말고도 여러가지 방법이 존재한다. // mdn에서 따오면 됨
-const colors = document.getElementsByClassName("jsColor");
-const range = document.getElementById("jsRange");
-const mode = document.getElementById("jsMode");
+const ctx = canvas.getContext("2d"); //canvas에 2d 모형이 들어가 있는 모음집
 
+// 변수
 const CANVAS_SIZE = 700;
-const INITIAL_COLOR = "#2c2c2c";
-
-// init value
-let painting = false;
-let filling = false;
-ctx.strokeStyle = INITIAL_COLOR;
-ctx.lineWidth = 2.5;
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
 
-function stopPainting() {
-  painting = false;
+// eventListener
+if (canvas) {
+  canvas.addEventListener("mousemove", onMouseMove); // 마우스가 움직일 경우
+  canvas.addEventListener("mousedown", onMouseDown); // 눌렀을 경우
+  canvas.addEventListener("mouseup", stopPainting); // 땟을 경우
+  canvas.addEventListener("mouseleave", stopPainting); // element 밖으로 이동한 경우
+  canvas.addEventListener("click", handleCanvasClick);
+  canvas.addEventListener("click", handleCanvasClick);
+  canvas.addEventListener("contextmenu", handleCM);
 }
 
-function startPainting() {
-  painting = true;
-}
-
+// callback 함수
 function onMouseMove(event) {
   const x = event.offsetX;
   const y = event.offsetY;
   if (!painting) {
-    ctx.beginPath(); // 다음 begin 되기 전까지 하나의 도형이다. // ㅋㅋ close가 된다고 그 지점이 begin지점이 되는 것은 아니다.
+    ctx.beginPath();
     ctx.moveTo(x, y); // 계속해서 시작지점을 정해주고 있다.
   } else {
     ctx.lineTo(x, y);
@@ -39,8 +35,8 @@ function onMouseDown(event) {
   painting = true;
 }
 
-function onMouseUp(event) {
-  stopPainting();
+function stopPainting() {
+  painting = false;
 }
 
 function handleColorClik(event) {
@@ -49,19 +45,89 @@ function handleColorClik(event) {
   ctx.fillStyle = color;
 }
 
-function handleRangeChange(event) {
-  const size = event.target.value;
-  ctx.lineWidth = size;
+function handleCanvasClick() {
+  if (filling) {
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  }
 }
 
+function handleCM(event) {
+  event.preventDefault();
+}
+
+// body - div class = "controls" - div class = "controls_range"
+const range = document.getElementById("jsRange");
+
+// init value
+ctx.lineWidth = 2.5; // 초기 선굵기
+
+// eventListenr
+if (range) {
+  range.addEventListener("input", handleRangeChange);
+}
+
+// callback canvas 줄 사이즈 바꿈
+function handleRangeChange(event) {
+  const size = event.target.value; // event target 속성은 이벤트가 발생한 대상 객체를 가리킨다.
+  ctx.lineWidth = size; // canvas 쪽 line 크기를 바꿔줌
+}
+
+// body - div class = "controls" - div class = "controls_btns" - <button tag> Fill
+const mode = document.getElementById("jsMode");
+
+// init value
+let painting = false;
+let filling = false;
+
+// eventListener
+if (mode) {
+  mode.addEventListener("click", handleModeClick);
+}
+
+// callback
 function handleModeClick() {
   if (filling === true) {
+    // 배경을 칠하기
     filling = false;
     mode.innerText = "Fill";
   } else {
+    // 선 그리기
     filling = true;
     mode.innerText = "Paint";
   }
+}
+
+// body - div class = "controls" - div class = "controls_btns" - <button tag> save
+const saveBtn = document.getElementById("jsSave");
+
+// eventListener
+if (saveBtn) {
+  saveBtn.addEventListener("click", handleSaveClick);
+}
+
+// callback
+function handleSaveClick() {
+  const image = canvas.toDataURL();
+  const link = document.createElement("a");
+  link.href = image;
+  link.download = "PaintJS[🎨]";
+  link.click();
+}
+
+const colors = document.getElementsByClassName("jsColor");
+
+const INITIAL_COLOR = "#2c2c2c";
+
+// init value
+
+ctx.strokeStyle = INITIAL_COLOR;
+
+function startPainting() {
+  painting = true;
+}
+
+function onMouseUp(event) {
+  stopPainting();
 }
 
 function handleCanvasClick() {
@@ -70,32 +136,10 @@ function handleCanvasClick() {
   }
 }
 
-if (canvas) {
-  canvas.addEventListener("mousemove", onMouseMove); // 마우스가 움직일 경우
-  canvas.addEventListener("mousedown", onMouseDown); // 눌렀을 경우
-  canvas.addEventListener("mouseup", stopPainting); // 땟을 경우
-  canvas.addEventListener("mouseleave", stopPainting); // element 밖으로 이동한 경우
-  canvas.addEventListener("click", handleCanvasClick);
-}
-
 Array.from(colors).forEach(color =>
   color.addEventListener("click", handleColorClik)
 );
 
-if (range) {
-  range.addEventListener("input", handleRangeChange);
-}
-
 if (mode) {
   mode.addEventListener("click", handleModeClick);
 }
-
-/*
-1. 통상적인 로직
--> html 문서중 연결시키고픈 곳에 document 따서 리스너와 연결
--> 리스너는 이벤트 발생시킬 경우 실행시킬 콜백함수에 연결
--> 콜백함수를 잘 꾸며서 사용하자
-
-마우스가 움직일 경우 onMouseMove가 실행된다. 이 때 매개변수로 통념상 event를 적어주고 브라우저로부터 받은 event객체 안에 많은 정보들이 들어있다.
-Listener를 이용해서 event 를 발생시킨뒤 event를 다루는 함수를 만들면 일반적인 로직이다.
-*/

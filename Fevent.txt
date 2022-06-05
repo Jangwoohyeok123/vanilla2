@@ -1,0 +1,22 @@
+[mousemove event]
+- function onMouseMove
+  - event x,y 좌표값이 담긴 const x, const y 값 계속 바뀜
+  - painting boolean을 중심으로 분기작성
+  - false일 경우 : ctx.beginPath() 
+	         ctx.moveTo(x,y) 
+
+
+
+# beginPath : begibs a path, or resets the current path.
+# path : 
+
+
+
+
+[mousedown event]
+
+[mouseup event]
+
+[mouseleave event && click event]
+- mousedown event는 누르고 있는 상태
+- click event는 클릭을 하고 마우스가 띄어짐 까지 
