@@ -2,7 +2,7 @@
 const canvas = document.getElementById("jsCanvas");
 const ctx = canvas.getContext("2d"); //canvas에 2d 모형이 들어가 있는 모음집
 
-// 변수
+// init value
 const CANVAS_SIZE = 700;
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
@@ -10,15 +10,14 @@ canvas.height = CANVAS_SIZE;
 // eventListener
 if (canvas) {
   canvas.addEventListener("mousemove", onMouseMove); // 마우스가 움직일 경우
-  canvas.addEventListener("mousedown", onMouseDown); // 눌렀을 경우
+  canvas.addEventListener("mousedown", startPainting); // 눌렀을 경우
   canvas.addEventListener("mouseup", stopPainting); // 땟을 경우
   canvas.addEventListener("mouseleave", stopPainting); // element 밖으로 이동한 경우
-  canvas.addEventListener("click", handleCanvasClick);
   canvas.addEventListener("click", handleCanvasClick);
   canvas.addEventListener("contextmenu", handleCM);
 }
 
-// callback 함수
+// callback
 function onMouseMove(event) {
   const x = event.offsetX;
   const y = event.offsetY;
@@ -31,18 +30,14 @@ function onMouseMove(event) {
   }
 }
 
-function onMouseDown(event) {
-  painting = true;
-}
-
 function stopPainting() {
+  // 마우스에서 손을 똇을 경우
   painting = false;
 }
 
-function handleColorClik(event) {
-  const color = event.target.style.backgroundColor;
-  ctx.strokeStyle = color;
-  ctx.fillStyle = color;
+function startPainting() {
+  // 마우스를 누른 경우
+  painting = true;
 }
 
 function handleCanvasClick() {
@@ -72,7 +67,7 @@ function handleRangeChange(event) {
   ctx.lineWidth = size; // canvas 쪽 line 크기를 바꿔줌
 }
 
-// body - div class = "controls" - div class = "controls_btns" - <button tag> Fill
+// body - div class = "controls" - div class = "controls_btns" - <button tag> Fill,Paint
 const mode = document.getElementById("jsMode");
 
 // init value
@@ -87,13 +82,11 @@ if (mode) {
 // callback
 function handleModeClick() {
   if (filling === true) {
-    // 배경을 칠하기
     filling = false;
-    mode.innerText = "Fill";
+    mode.innerText = "FILL";
   } else {
-    // 선 그리기
     filling = true;
-    mode.innerText = "Paint";
+    mode.innerText = "PAINT";
   }
 }
 
@@ -114,32 +107,21 @@ function handleSaveClick() {
   link.click();
 }
 
+// body - div class = "controls" - div class = "controls_colors" - div class = "controls_color jsColor"
 const colors = document.getElementsByClassName("jsColor");
 
-const INITIAL_COLOR = "#2c2c2c";
-
 // init value
-
+const INITIAL_COLOR = "#2c2c2c";
 ctx.strokeStyle = INITIAL_COLOR;
 
-function startPainting() {
-  painting = true;
-}
-
-function onMouseUp(event) {
-  stopPainting();
-}
-
-function handleCanvasClick() {
-  if (filling) {
-    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-  }
-}
-
+// eventListener
 Array.from(colors).forEach(color =>
   color.addEventListener("click", handleColorClik)
 );
 
-if (mode) {
-  mode.addEventListener("click", handleModeClick);
+// callback
+function handleColorClik(event) {
+  const color = event.target.style.backgroundColor;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
 }
